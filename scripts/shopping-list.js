@@ -1,7 +1,5 @@
-const store = {
-  items: [],
-  hideCheckedItems: false
-};
+import store from './store.js';
+import item from './item.js';
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class="shopping-item shopping-item__checked">${item.name}</span>`;
@@ -45,7 +43,15 @@ const render = function () {
 };
 
 const addItemToShoppingList = function (itemName) {
-  store.items.push({ id: cuid(), name: itemName, checked: false });
+  //store.items.push({ id: cuid(), name: itemName, checked: false });
+  try {
+    item.validateName(itemName);
+    store.items.push(item.create(itemName));
+    render();
+  }
+  catch (error) {
+    console.log(`${error.message}`);
+  }
 };
 
 const handleNewItemSubmit = function () {
@@ -68,6 +74,12 @@ const handleItemCheckClicked = function () {
     const id = getItemIdFromElement(event.currentTarget);
     toggleCheckedForListItem(id);
     render();
+  });
+};
+
+const handleToggleFilterClick = function () {
+  $('.js-filter-checked').click(() => {
+    return render(store.toggleCheckedFilter());
   });
 };
 
@@ -101,24 +113,6 @@ const handleDeleteItemClicked = function () {
 const editListItemName = function (id, itemName) {
   const item = store.items.find(item => item.id === id);
   item.name = itemName;
-};
-
-/**
- * Toggles the store.hideCheckedItems property
- */
-const toggleCheckedItemsFilter = function () {
-  store.hideCheckedItems = !store.hideCheckedItems;
-};
-
-/**
- * Places an event listener on the checkbox
- * for hiding completed items.
- */
-const handleToggleFilterClick = function () {
-  $('.js-filter-checked').click(() => {
-    toggleCheckedItemsFilter();
-    render();
-  });
 };
 
 const handleEditShoppingItemSubmit = function () {
